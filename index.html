@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Business ROI Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .calculator-section {
+            padding: 40px;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .input-group:nth-child(1) { animation-delay: 0.1s; }
+        .input-group:nth-child(2) { animation-delay: 0.2s; }
+        .input-group:nth-child(3) { animation-delay: 0.3s; }
+        .input-group:nth-child(4) { animation-delay: 0.4s; }
+        .input-group:nth-child(5) { animation-delay: 0.5s; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        .input-container {
+            position: relative;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.1);
+        }
+
+        .unit {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+            font-weight: 500;
+        }
+
+        .calculate-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 18px;
+            font-size: 1.2em;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 30px 0;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .results {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+            display: none;
+        }
+
+        .results.show {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .roi-metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #e1e5e9;
+        }
+
+        .roi-metric:last-child {
+            border-bottom: none;
+        }
+
+        .metric-label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .metric-value {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .payback-highlight {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .payback-highlight h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .email-capture {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .email-input {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .email-input input[type="email"] {
+            flex: 1;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            min-width: 250px;
+        }
+
+        .email-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .email-btn:hover {
+            background: white;
+            color: #28a745;
+        }
+
+        .recommendation {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .recommendation.strong {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .recommendation.moderate {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .recommendation.weak {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .calculator-section {
+                padding: 20px;
+            }
+            
+            .email-input {
+                flex-direction: column;
+            }
+            
+            .email-input input[type="email"] {
+                min-width: auto;
+            }
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            margin-left: 5px;
+            cursor: help;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.9em;
+            font-weight: normal;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💰 Service Business ROI Calculator</h1>
+            <p>Discover if mobile technology will pay off for your business in under 3 minutes</p>
+        </div>
+        
+        <div class="calculator-section">
+            <div class="input-group">
+                <label for="paymentDays">Average days to collect payment 
+                    <span class="tooltip">ℹ️
+                        <span class="tooltiptext">From invoice sent to payment received</span>
+                    </span>
+                </label>
+                <div class="input-container">
+                    <input type="number" id="paymentDays" min="0" max="365" value="30">
+                    <span class="unit">days</span>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="adminHours">Owner admin hours per week 
+                    <span class="tooltip">ℹ️
+                        <span class="tooltiptext">Time on scheduling, invoicing, paperwork</span>
+                    </span>
+                </label>
+                <div class="input-container">
+                    <input type="number" id="adminHours" min="0" max="80" value="20">
+                    <span class="unit">hours</span>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="materialWaste">Material waste percentage 
+                    <span class="tooltip">ℹ️
+                        <span class="tooltiptext">Over-ordering, theft, spoilage, rework</span>
+                    </span>
+                </label>
+                <div class="input-container">
+                    <input type="number" id="materialWaste" min="0" max="50" value="5">
+                    <span class="unit">%</span>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="monthlyRevenue">Monthly revenue 
+                    <span class="tooltip">ℹ️
+                        <span class="tooltiptext">Average monthly gross revenue</span>
+                    </span>
+                </label>
+                <div class="input-container">
+                    <input type="number" id="monthlyRevenue" min="0" value="75000">
+                    <span class="unit">$</span>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="materialCosts">Monthly material costs 
+                    <span class="tooltip">ℹ️
+                        <span class="tooltiptext">Direct materials, supplies, inventory</span>
+                    </span>
+                </label>
+                <div class="input-container">
+                    <input type="number" id="materialCosts" min="0" value="15000">
+                    <span class="unit">$</span>
+                </div>
+            </div>
+
+            <button class="calculate-btn" onclick="calculateROI()">Calculate My ROI</button>
+
+            <div id="results" class="results">
+                <div class="payback-highlight">
+                    <h3>Payback Period</h3>
+                    <div id="paybackPeriod" style="font-size: 2em; font-weight: 800;"></div>
+                </div>
+
+                <div class="roi-metric">
+                    <span class="metric-label">Monthly Pain Point Cost:</span>
+                    <span id="monthlyCost" class="metric-value"></span>
+                </div>
+                
+                <div class="roi-metric">
+                    <span class="metric-label">Annual Cost of Inefficiency:</span>
+                    <span id="annualCost" class="metric-value"></span>
+                </div>
+                
+                <div class="roi-metric">
+                    <span class="metric-label">Technology Investment:</span>
+                    <span class="metric-value">$2,000/month</span>
+                </div>
+                
+                <div class="roi-metric">
+                    <span class="metric-label">Net Annual Savings:</span>
+                    <span id="netSavings" class="metric-value"></span>
+                </div>
+                
+                <div class="roi-metric">
+                    <span class="metric-label">Year 1 ROI:</span>
+                    <span id="roiPercent" class="metric-value"></span>
+                </div>
+
+                <div id="recommendation" class="recommendation"></div>
+
+                <div class="email-capture">
+                    <h3>🚀 Get Your Detailed Implementation Roadmap</h3>
+                    <p>I'll send you the exact 90-day technology rollout plan that helped my landscaping client achieve 891% ROI</p>
+                    <div class="email-input">
+                        <input type="email" id="emailInput" placeholder="Enter your email address">
+                        <button class="email-btn" onclick="captureEmail()">Send My Roadmap</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function calculateROI() {
+            // Get input values
+            const paymentDays = parseFloat(document.getElementById('paymentDays').value) || 0;
+            const adminHours = parseFloat(document.getElementById('adminHours').value) || 0;
+            const materialWaste = parseFloat(document.getElementById('materialWaste').value) || 0;
+            const monthlyRevenue = parseFloat(document.getElementById('monthlyRevenue').value) || 0;
+            const materialCosts = parseFloat(document.getElementById('materialCosts').value) || 0;
+
+            // Calculate pain point costs
+            const paymentDelayCost = Math.max(0, (paymentDays - 5) * 500); // Assuming 5 days is optimal
+            const adminCost = adminHours * 75 * 4.33; // $75/hour * weeks per month
+            const wasteCost = (materialWaste / 100) * materialCosts;
+            
+            // Monthly pain point cost
+            const monthlyCost = paymentDelayCost + adminCost + wasteCost;
+            const annualCost = monthlyCost * 12;
+            
+            // Technology costs
+            const monthlyTechCost = 2000;
+            const annualTechCost = monthlyTechCost * 12;
+            
+            // Net savings and ROI
+            const netAnnualSavings = annualCost - annualTechCost;
+            const roiPercent = annualTechCost > 0 ? ((netAnnualSavings / annualTechCost) * 100) : 0;
+            
+            // Payback period in months
+            const paybackMonths = monthlyCost > monthlyTechCost ? 
+                (15000 / (monthlyCost - monthlyTechCost)) : 999;
+
+            // Update UI
+            document.getElementById('monthlyCost').textContent = `$${monthlyCost.toLocaleString()}`;
+            document.getElementById('annualCost').textContent = `$${annualCost.toLocaleString()}`;
+            document.getElementById('netSavings').textContent = `$${netAnnualSavings.toLocaleString()}`;
+            document.getElementById('roiPercent').textContent = `${roiPercent.toFixed(0)}%`;
+            
+            // Payback period display
+            if (paybackMonths < 12) {
+                document.getElementById('paybackPeriod').textContent = `${paybackMonths.toFixed(1)} months`;
+            } else if (paybackMonths < 999) {
+                document.getElementById('paybackPeriod').textContent = `${(paybackMonths/12).toFixed(1)} years`;
+            } else {
+                document.getElementById('paybackPeriod').textContent = 'No payback';
+            }
+
+            // Recommendation
+            const recommendationEl = document.getElementById('recommendation');
+            if (roiPercent > 200) {
+                recommendationEl.className = 'recommendation strong';
+                recommendationEl.textContent = '🎯 STRONG ROI: Technology investment highly recommended. Your pain points are costing more than the solution!';
+            } else if (roiPercent > 50) {
+                recommendationEl.className = 'recommendation moderate';
+                recommendationEl.textContent = '⚡ MODERATE ROI: Technology could pay off. Consider focusing on your biggest pain points first.';
+            } else {
+                recommendationEl.className = 'recommendation weak';
+                recommendationEl.textContent = '⚠️ WEAK ROI: Your current processes may be efficient enough. Focus on growth before technology.';
+            }
+
+            // Show results
+            document.getElementById('results').classList.add('show');
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function captureEmail() {
+            const email = document.getElementById('emailInput').value;
+            if (email && email.includes('@')) {
+                // In a real implementation, this would send to your email service
+                alert('Thanks! Your implementation roadmap will be sent to ' + email + ' within 24 hours.');
+                
+                // Track the conversion (you'd integrate with your analytics)
+                console.log('Email captured:', email);
+                
+                // Store in memory for this session (since we can't use localStorage)
+                window.capturedEmail = email;
+            } else {
+                alert('Please enter a valid email address.');
+            }
+        }
+
+        // Add some interactive animations
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputs = document.querySelectorAll('input[type="number"]');
+            inputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    // Hide results when inputs change
+                    document.getElementById('results').classList.remove('show');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
